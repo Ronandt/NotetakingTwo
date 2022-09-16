@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">NotetakingTwo</string>
+    <string-array name="sort_array">
+        <item>Last Added</item>
+        <item>Last Edited</item>
+
+        <item>Alphabetically</item>
+    </string-array>
+</resources>
