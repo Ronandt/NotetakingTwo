@@ -16,6 +16,7 @@ import android.widget.Spinner
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.view.get
+import androidx.lifecycle.ViewModelProviders
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.whenStarted
 import com.example.notetakingtwo.Models.Note
@@ -24,6 +25,10 @@ import com.example.notetakingtwo.Retrofit.NoteRestApiService
 
 import com.example.notetakingtwo.databinding.ActivityMainBinding
 import com.example.notetakingtwo.repositories.NotesRepository
+import com.example.notetakingtwo.viewmodels.LoginViewModel
+import com.example.notetakingtwo.viewmodels.LoginViewModelFactory
+import com.example.notetakingtwo.viewmodels.NotesViewModel
+import com.example.notetakingtwo.viewmodels.NotesViewModelFactory
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
 
@@ -32,6 +37,7 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.*
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import java.time.Instant
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
@@ -44,6 +50,7 @@ class MainActivity : AppCompatActivity(){
     private val ACTIVITY_CODE: Int = 1
     private lateinit var notesInfo: MutableList<Note>
     private val noteRepository: NotesRepository = NotesRepository(NoteRestApiService())
+    private lateinit var viewModel: NotesViewModel
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         val handler = CoroutineExceptionHandler { _, exception ->
@@ -61,15 +68,21 @@ class MainActivity : AppCompatActivity(){
         setContentView(binding.root)
 
         registerForContextMenu(binding.layoutTwo)
+        viewModel = ViewModelProviders.of(this,NotesViewModelFactory(application)).get(
+            NotesViewModel::class.java)
 
 
         Log.d("IHFIOSOFHSFS", "HIHIHIHII")
         lifecycleScope.launch(handler){
 
+
+
                 val result = (application as NoteTakingApplication).loggedUser?.let {
                  println("IIJIJOOPPJOFPJOPFJFOPEJOPFWJFOPJFWOPJ")
                     noteRepository.getNotes(
                         it._id)
+
+                    //viewModel.getNotes(it._id)
 
                 }
                 if (result != null) {
@@ -132,19 +145,23 @@ class MainActivity : AppCompatActivity(){
 
 
                 println(adapter.getItem(p2).toString())
+                println(notesAdapter
+                )
                 val savedNotesInfo: MutableList<Note> =  notesAdapter?.objects?.toMutableList()!!
+                Log.d("T", savedNotesInfo.toString())
                 notesAdapter?.clear()
                 if(adapter.getItem(p2).toString() == "Last Edited") {
                     println("FJSIOFJIOFIWEOFJIOJFIOJFIOWEJFWIOFJIOFJWEIOFWJEIOWJIOFWJIOJIOEJIEO")
-                    notesAdapter?.addAll(savedNotesInfo)
+                    notesAdapter?.addAll(savedNotesInfo.sortedBy { Instant.parse(it.updatedAt).epochSecond}.reversed())
 
 
                 } else if (adapter.getItem(p2).toString() == "Last Added"){
-                    notesAdapter?.addAll(savedNotesInfo)
+                    notesAdapter?.addAll(savedNotesInfo.sortedBy { Instant.parse(it.createdAt).epochSecond}.reversed())
                 }
                 else if(adapter.getItem(p2).toString() == "Alphabetically") {
-                    notesAdapter?.addAll(savedNotesInfo.sortedBy { it.title }.toMutableList())
+                    notesAdapter?.addAll(savedNotesInfo.sortedBy { it.title })
                 }
+                Log.d("T", notesAdapter!!.objects.toString())
                 adapter.notifyDataSetChanged()
 
             }
@@ -226,6 +243,14 @@ class MainActivity : AppCompatActivity(){
 
             //notesAdapter.set(1, "ff")
 
+        }
+    }
+
+    fun observeNotesDataSet() {
+        viewModel.allNotesLiveData.observe(this@MainActivity) {
+            notesAdapter = NotesAdapter(this@MainActivity, R.layout.list_item,it)
+            binding.layoutTwo.adapter = notesAdapter
+            notesAdapter!!.notifyDataSetChanged()
         }
     }
 

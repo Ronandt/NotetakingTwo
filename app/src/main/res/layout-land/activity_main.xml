@@ -63,18 +63,18 @@
     </LinearLayout>
 
     <TextView
-        android:layout_width="387dp"
+        android:id="@+id/header"
+
+        android:layout_width="418dp"
         android:layout_height="wrap_content"
         android:layout_below="@id/line"
         android:layout_alignParentEnd="true"
-        android:layout_marginTop="10dp"
-        android:layout_marginEnd="4dp"
 
-        android:width="100000dp"
+        android:layout_marginTop="6dp"
+        android:layout_marginEnd="141dp"
         android:background="@color/purple_500"
         android:gravity="center"
         android:paddingBottom="10dp"
-        android:id="@+id/header"
 
         android:text="Notes"
         android:textColor="@color/white"
