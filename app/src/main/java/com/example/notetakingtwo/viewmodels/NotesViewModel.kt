@@ -10,14 +10,19 @@ import com.example.notetakingtwo.NoteTakingApplication
 import com.example.notetakingtwo.Retrofit.NoteRestApiService
 import com.example.notetakingtwo.repositories.NotesRepository
 import kotlinx.coroutines.launch
+import java.time.Instant
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
 class NotesViewModel(application: Application): AndroidViewModel(application) {
+
     private val notesRepository: NotesRepository = NotesRepository(NoteRestApiService())
     lateinit var notesListController: MutableList<Note>
     private val _allNotesLiveData: MutableLiveData<MutableList<Note>> = MutableLiveData()
+
+    private val _spinnerValuesLiveData: MutableLiveData<String> = MutableLiveData()
+    val spinnerValuesLiveData: MutableLiveData<String> = _spinnerValuesLiveData
 
     init {
         viewModelScope.launch {
@@ -52,10 +57,54 @@ class NotesViewModel(application: Application): AndroidViewModel(application) {
 
     fun updateNote(note: Note, it: Int) {
         viewModelScope.launch {
+            //TODO Repository must be moved here instead of the other UpdateActivity
             _allNotesLiveData.value?.set(it, note)
             _allNotesLiveData.value = _allNotesLiveData.value
         }
     }
+
+    fun deleteNote(note: Note) {
+        viewModelScope.launch {
+            notesRepository.deleteNote(note)
+            _allNotesLiveData.value?.remove(note)
+            _allNotesLiveData.value = _allNotesLiveData.value
+            Toast.makeText(getApplication(),"Note has been removed!", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun sortNote() {
+        val savedNotesInfo: MutableList<Note> =  _allNotesLiveData.value?.toMutableList()!!
+        _allNotesLiveData.value?.clear()
+        when(_spinnerValuesLiveData.value) {
+            "Last Edited" -> {
+                savedNotesInfo.sortedBy { Instant.parse(it.updatedAt).epochSecond }.reversed().toMutableList()
+                    .let { _allNotesLiveData.value!!.addAll(it) }
+            }
+            "Last Added" -> {
+                savedNotesInfo.sortedBy { Instant.parse(it.createdAt).epochSecond }.reversed().toMutableList()
+                    .let { _allNotesLiveData.value!!.addAll(it) }
+
+            }
+            "Alphabetically" -> {
+                savedNotesInfo.sortedBy { it.title }.toMutableList()
+                    .let { _allNotesLiveData.value!!.addAll(it) }
+            }
+
+        }
+        _allNotesLiveData.value = _allNotesLiveData.value
+    }
+
+    fun changeSpinnerValueState(spinnerState: String) {
+        _spinnerValuesLiveData.value = spinnerState
+
+    }
+
+
+
+
 
 
 

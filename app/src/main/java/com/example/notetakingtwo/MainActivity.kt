@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.PersistableBundle
 import android.util.Log
 import android.view.ContextMenu
 import android.view.Menu
@@ -30,6 +31,7 @@ import com.example.notetakingtwo.viewmodels.LoginViewModelFactory
 import com.example.notetakingtwo.viewmodels.NotesViewModel
 import com.example.notetakingtwo.viewmodels.NotesViewModelFactory
 import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 
@@ -45,12 +47,13 @@ import java.time.format.DateTimeFormatter
 
 class MainActivity : AppCompatActivity(){
     private lateinit var binding: ActivityMainBinding
-
+    private lateinit var spinnerAdapter: ArrayAdapter<String>
     private var notesAdapter: NotesAdapter? = null
     private val ACTIVITY_CODE: Int = 1
     private lateinit var notesInfo: MutableList<Note>
     private val noteRepository: NotesRepository = NotesRepository(NoteRestApiService())
     private lateinit var viewModel: NotesViewModel
+    private var spinnerValue: Int = 0
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         val handler = CoroutineExceptionHandler { _, exception ->
@@ -68,86 +71,65 @@ class MainActivity : AppCompatActivity(){
         setContentView(binding.root)
 
         registerForContextMenu(binding.layoutTwo)
-        viewModel = ViewModelProviders.of(this,NotesViewModelFactory(application)).get(
-            NotesViewModel::class.java)
 
 
-        Log.d("IHFIOSOFHSFS", "HIHIHIHII")
-        lifecycleScope.launch(handler){
+            viewModel = ViewModelProviders.of(this, NotesViewModelFactory(application)).get(
+                NotesViewModel::class.java
+            )
 
+            Log.d("IHFIOSOFHSFS", "HIHIHIHII")
 
-
-                val result = (application as NoteTakingApplication).loggedUser?.let {
-                 println("IIJIJOOPPJOFPJOPFJFOPEJOPFWJFOPJFWOPJ")
-                    noteRepository.getNotes(
-                        it._id)
-
-                    //viewModel.getNotes(it._id)
-
-                }
-                if (result != null) {
-                    notesInfo = result.toMutableList()
-
-                    println(notesInfo)
+            //add the stuff
+        lifecycleScope.launch {
+            delay(50L)
+            notesAdapter =
+                NotesAdapter(this@MainActivity, R.layout.list_item, viewModel.notesListController)
+            binding.layoutTwo.adapter = notesAdapter
 
 
 
-                    notesAdapter = NotesAdapter(this@MainActivity, R.layout.list_item, notesInfo)
-                }
-                binding.layoutTwo.adapter =notesAdapter
 
-
-        }
-        binding.apply {
+            binding.apply {
 
                 createNote.setOnClickListener {
-                    val note = (application as NoteTakingApplication).loggedUser?.let { it1 -> Note( description.text.toString(), titleName.text.toString(), it1._id, createdAt= ZonedDateTime.now( ZoneOffset.UTC ).format( DateTimeFormatter.ISO_INSTANT ), updatedAt=ZonedDateTime.now( ZoneOffset.UTC ).format( DateTimeFormatter.ISO_INSTANT )) }
-                    println(note)
-                    if (note != null) {
-                        lifecycleScope.launch {
-                            noteRepository.addNote(note)
-                        }
-                    }
+                    viewModel.createNote(description.text.toString(), titleName.text.toString())
                     description.text.clear()
                     titleName.text.clear()
 
-                    notesAdapter?.let {
-                        notesAdapter!!.insert(note, 0)
-
-
-
-                        notesAdapter!!.notifyDataSetChanged()
-                        Toast.makeText(applicationContext, "Note has been added!", Toast.LENGTH_SHORT).show()
-                    } ?: let {
-
-                        Toast.makeText(applicationContext, "We have some trouble connecting to the server!", Toast.LENGTH_SHORT).show()
-                    }
-
                 }
 
 
-
-
-        }
-
-
-        val spinner: Spinner = findViewById(R.id.sort_spinner)
-        val adapter = ArrayAdapter.createFromResource(this@MainActivity, R.array.sort_array, android.R.layout.simple_spinner_item)
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        spinner.adapter = adapter
-
-        spinner.onItemSelectedListener = object: AdapterView.OnItemSelectedListener {
-            override fun onNothingSelected(p0: AdapterView<*>?) {
-
             }
 
-            override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
 
+            val spinner: Spinner = findViewById(R.id.sort_spinner)
+            val spinnerAdapter = ArrayAdapter.createFromResource(
+                this@MainActivity,
+                R.array.sort_array,
+                android.R.layout.simple_spinner_item
+            )
+            spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            spinner.adapter = spinnerAdapter
 
-                println(adapter.getItem(p2).toString())
-                println(notesAdapter
-                )
-                val savedNotesInfo: MutableList<Note> =  notesAdapter?.objects?.toMutableList()!!
+            if(savedInstanceState != null) {
+                spinner.setSelection(savedInstanceState.getInt("spinnerValue", 0))
+                print(savedInstanceState.getInt("spinnerValue", 0))
+            }
+
+            spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                override fun onNothingSelected(p0: AdapterView<*>?) {
+
+                }
+
+                override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
+                    spinnerValue = p2
+                    viewModel.changeSpinnerValueState(spinnerAdapter.getItem(spinnerValue).toString())
+                    println(spinnerAdapter.getItem(spinnerValue).toString())
+                    println(
+                        notesAdapter
+                    )
+                    viewModel.sortNote()
+                    /* val savedNotesInfo: MutableList<Note> =  notesAdapter?.objects?.toMutableList()!!
                 Log.d("T", savedNotesInfo.toString())
                 notesAdapter?.clear()
                 if(adapter.getItem(p2).toString() == "Last Edited") {
@@ -162,9 +144,12 @@ class MainActivity : AppCompatActivity(){
                     notesAdapter?.addAll(savedNotesInfo.sortedBy { it.title })
                 }
                 Log.d("T", notesAdapter!!.objects.toString())
-                adapter.notifyDataSetChanged()
+                adapter.notifyDataSetChanged()*/
 
+                }
             }
+            observeSortedLastChange()
+            observeNotesDataSet()
         }
 
 
@@ -204,20 +189,7 @@ class MainActivity : AppCompatActivity(){
         return when(item.itemId) {
             R.id.delete -> {
                 val info = item.menuInfo as AdapterView.AdapterContextMenuInfo
-                             lifecycleScope.launch {
-                    noteRepository.deleteNote((binding.layoutTwo.adapter.getItem(info.position) as Note))
-                }
-
-                lifecycleScope.launch {
-
-                    notesAdapter?.remove(binding.layoutTwo.adapter.getItem(info.position) as Note)
-
-                    notesAdapter?.notifyDataSetChanged()
-
-                    Toast.makeText(applicationContext,"Note has been removed!", Toast.LENGTH_SHORT).show()
-
-                }
-
+                viewModel.deleteNote((binding.layoutTwo.adapter.getItem(info.position) as Note))
                 true
             }
             R.id.update -> {
@@ -238,7 +210,7 @@ class MainActivity : AppCompatActivity(){
         if((requestCode == ACTIVITY_CODE) and (resultCode == Activity.RESULT_OK)) {
            val note: Note =  Json.decodeFromString<Note>(data?.getStringExtra("note")?:"")
 
-            data?.getIntExtra("position", -1)?.let { notesAdapter?.updatePosition(note, it)
+            data?.getIntExtra("position", -1)?.let { viewModel.updateNote(note, it)
                }
 
             //notesAdapter.set(1, "ff")
@@ -246,11 +218,26 @@ class MainActivity : AppCompatActivity(){
         }
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putInt("spinnerValue", spinnerValue)
+        super.onSaveInstanceState(outState)
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        spinnerValue = savedInstanceState.getInt("spinnerValue")
+        super.onRestoreInstanceState(savedInstanceState)
+    }
+
     fun observeNotesDataSet() {
         viewModel.allNotesLiveData.observe(this@MainActivity) {
-            notesAdapter = NotesAdapter(this@MainActivity, R.layout.list_item,it)
-            binding.layoutTwo.adapter = notesAdapter
+            println("OBSERVED")
             notesAdapter!!.notifyDataSetChanged()
+        }
+    }
+
+    fun observeSortedLastChange() {
+        viewModel.spinnerValuesLiveData.observe(this@MainActivity) {
+            println("CHANGED")
         }
     }
 
