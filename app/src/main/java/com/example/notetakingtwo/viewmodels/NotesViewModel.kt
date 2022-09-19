@@ -26,6 +26,7 @@ class NotesViewModel(application: Application): AndroidViewModel(application) {
 
     init {
         viewModelScope.launch {
+            println("VIEWMODEL INIT")
             notesListController = (getApplication() as NoteTakingApplication).loggedUser?.let {
                 notesRepository.getNotes(
                     it._id
@@ -57,7 +58,7 @@ class NotesViewModel(application: Application): AndroidViewModel(application) {
 
     fun updateNote(note: Note, it: Int) {
         viewModelScope.launch {
-            //TODO Repository must be moved here instead of the other UpdateActivity
+
             _allNotesLiveData.value?.set(it, note)
             _allNotesLiveData.value = _allNotesLiveData.value
         }
@@ -107,6 +108,10 @@ class NotesViewModel(application: Application): AndroidViewModel(application) {
             _spinnerValuesLiveData.value = spinnerState
         }
 
+    }
+
+    fun isNotesListControllerInit(): Boolean {
+        return this::notesListController.isInitialized
     }
 
 

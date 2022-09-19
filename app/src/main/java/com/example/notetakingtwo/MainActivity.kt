@@ -50,7 +50,12 @@ class MainActivity : AppCompatActivity(){
             viewModel = ViewModelProviders.of(this@MainActivity, NotesViewModelFactory(application)).get(
                 NotesViewModel::class.java
             )
-            delay(50L)
+
+            if(!viewModel.isNotesListControllerInit()) {
+                println("CONTROLLER LATEINIT INITALISED")
+                delay(50L)
+            }
+            println("LIFECYCLE SCOPE CREATION")
             notesAdapter =
                 NotesAdapter(this@MainActivity, R.layout.list_item, viewModel.notesListController)
             binding.layoutTwo.adapter = notesAdapter
