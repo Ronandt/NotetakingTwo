@@ -22,7 +22,7 @@ class Register : AppCompatActivity() {
         binding.apply {
             registerButton.setOnClickListener {
                 lifecycleScope.launch {
-                    val user = userRepository.registerUser(   User(
+                    val user = userRepository.registerUser(User(
                         login.text.toString(),
                         password.text.toString(),
                         email.text.toString()

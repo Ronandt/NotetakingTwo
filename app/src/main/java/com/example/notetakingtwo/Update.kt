@@ -44,9 +44,7 @@ class Update : AppCompatActivity() {
 
                     updateNote.setOnClickListener {
                         val note = Note(description.text.toString() ,titleName.text.toString(),noteObject._id, noteObject.createdAt, ZonedDateTime.now( ZoneOffset.UTC ).format( DateTimeFormatter.ISO_INSTANT ))
-                        lifecycleScope.launch {
-                                notesRepository.updateNote(note)
-                        }
+
 
                         val returnIntent: Intent = Intent()
                         returnIntent.putExtra("note", Json.encodeToString(note))

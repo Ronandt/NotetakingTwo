@@ -14,8 +14,7 @@ class SplashScreen : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash_screen)
 
-        // we used the postDelayed(Runnable, time) method
-        // to send a message with a delayed time.
+
 
         lifecycleScope.launch {
             delaySplash()

@@ -61,14 +61,19 @@ class NotesViewModel(application: Application): AndroidViewModel(application) {
             _allNotesLiveData.value?.set(it, note)
             _allNotesLiveData.value = _allNotesLiveData.value
         }
+        viewModelScope.launch {
+            notesRepository.updateNote(note)
+        }
     }
 
     fun deleteNote(note: Note) {
         viewModelScope.launch {
-            notesRepository.deleteNote(note)
             _allNotesLiveData.value?.remove(note)
             _allNotesLiveData.value = _allNotesLiveData.value
             Toast.makeText(getApplication(),"Note has been removed!", Toast.LENGTH_SHORT).show()
+        }
+        viewModelScope.launch {
+            notesRepository.deleteNote(note)
         }
     }
 
@@ -98,7 +103,9 @@ class NotesViewModel(application: Application): AndroidViewModel(application) {
     }
 
     fun changeSpinnerValueState(spinnerState: String) {
-        _spinnerValuesLiveData.value = spinnerState
+        if(spinnerState != _spinnerValuesLiveData.value) {
+            _spinnerValuesLiveData.value = spinnerState
+        }
 
     }
 
