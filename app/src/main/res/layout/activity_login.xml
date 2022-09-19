@@ -43,6 +43,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/password"
         android:orientation="horizontal"
+        android:id="@+id/buttonLayout"
         android:weightSum="1"
         android:gravity="center"
 
@@ -65,7 +66,14 @@
 
     </LinearLayout>
 
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/biometrics_button"
+        android:text="Login With Biometrics"
+        android:layout_below="@id/buttonLayout"
 
+        />
 
 
 </RelativeLayout>

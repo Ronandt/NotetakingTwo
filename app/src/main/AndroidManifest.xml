@@ -4,7 +4,7 @@
     package="com.example.notetakingtwo">
 
     <uses-permission android:name="android.permission.INTERNET" />
-
+    <uses-permission android:name="android.permission.USE_BIOMETRIC"/>
     <application
         android:name=".NoteTakingApplication"
         android:allowBackup="true"

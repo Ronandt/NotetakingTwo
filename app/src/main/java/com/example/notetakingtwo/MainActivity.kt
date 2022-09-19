@@ -53,7 +53,7 @@ class MainActivity : AppCompatActivity(){
 
             if(!viewModel.isNotesListControllerInit()) {
                 println("CONTROLLER LATEINIT INITALISED")
-                delay(50L)
+                delay(100L)
             }
             println("LIFECYCLE SCOPE CREATION")
             notesAdapter =
