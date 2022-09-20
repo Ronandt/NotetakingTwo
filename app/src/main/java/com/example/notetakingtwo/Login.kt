@@ -6,10 +6,14 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.hardware.biometrics.BiometricPrompt
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities.NET_CAPABILITY_INTERNET
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.CancellationSignal
+import android.view.View.GONE
+import android.view.View.VISIBLE
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
@@ -82,15 +86,23 @@ class Login : AppCompatActivity() {
                 startActivity(intent)
             }
         }
+
+        binding.tryAgainButton.setOnClickListener {
+            enableNetworkLayoutVisibiltiy()
+        }
+        enableNetworkLayoutVisibiltiy()
+
+
         observeLoginEvent()
     }
 
     @RequiresApi(Build.VERSION_CODES.P)
     override fun onStart() {
         super.onStart()
+
         val biometricsUsername: String? = sharedPref.getString("BiometricsUsername", "")
         val biometricsPassword: String? = sharedPref.getString("BiometricsPassword", "")
-        if((biometricsUsername != "") or (biometricsPassword != "")) {
+        if(((biometricsUsername != "") or (biometricsPassword != "")) and (isNetworkAvailable())) {
             biometricPrompt.authenticate(getCancellationSignal(), mainExecutor, authenticaionCallback)
         }
 
@@ -135,6 +147,30 @@ class Login : AppCompatActivity() {
 
     private fun authenticateWithBiometrics() {
 
+    }
+
+    @RequiresApi(Build.VERSION_CODES.M)
+    private fun isNetworkAvailable(): Boolean { //access network
+        val connectivityManager = getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager
+        val capabilities = connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
+        print((capabilities != null && capabilities.hasCapability(NET_CAPABILITY_INTERNET)))
+        return (capabilities != null && capabilities.hasCapability(NET_CAPABILITY_INTERNET))
+
+    }
+
+    @RequiresApi(Build.VERSION_CODES.M)
+    private fun enableNetworkLayoutVisibiltiy() {
+        if(isNetworkAvailable()) {
+            binding.noInternet?.visibility = GONE
+            binding.internet?.visibility = VISIBLE
+            println("hoi")
+
+        } else {
+            binding.internet?.visibility = GONE
+            binding.noInternet?.visibility = VISIBLE
+            println("hi")
+
+        }
     }
 
 }

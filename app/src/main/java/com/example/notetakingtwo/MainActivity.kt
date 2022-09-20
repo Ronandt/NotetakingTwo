@@ -190,6 +190,8 @@ class MainActivity : AppCompatActivity(){
         }
     }
 
+
+
     @RequiresApi(Build.VERSION_CODES.O)
     private fun observeSortedLastChange() {
         viewModel.spinnerValuesLiveData.observe(this@MainActivity) {

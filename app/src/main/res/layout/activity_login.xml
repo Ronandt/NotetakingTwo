@@ -1,10 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Login"
+    android:orientation="vertical"
+    tools:context=".Login">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/no_internet">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/noint"
+            android:id="@+id/noint"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/try_again_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/noint"
+            android:layout_centerHorizontal="true"
+            android:backgroundTint="@color/black"
+            android:paddingHorizontal="32dp"
+            android:text="Try Again"
+            android:layout_marginTop="-150dp"
+            android:textAllCaps="false"
+            app:cornerRadius="16dp" />
+
+    </RelativeLayout>
+<RelativeLayout
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/internet"
+
     android:padding="20dp">
 
     <TextView
@@ -77,3 +109,6 @@
 
 
 </RelativeLayout>
+
+
+</LinearLayout>

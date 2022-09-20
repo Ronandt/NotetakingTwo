@@ -48,15 +48,6 @@ class NotesAdapter(
         return v
     }
 
-    fun updatePosition(content: Note, position: Int) {
-        objects[position] = content
-        notifyDataSetChanged()
-    }
-
-    fun getList() {
-        println(objects)
-    }
-
 
 
 

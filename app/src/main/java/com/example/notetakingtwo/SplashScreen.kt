@@ -22,7 +22,7 @@ class SplashScreen : AppCompatActivity() {
 
     }
 
-    suspend fun delaySplash() {
+    private suspend fun delaySplash() {
         delay(300)
         val intent = Intent(this, Login::class.java)
         startActivity(intent)

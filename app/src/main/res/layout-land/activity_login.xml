@@ -1,71 +1,115 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Login"
-    android:padding="20dp">
-
-    <TextView
-        android:layout_height="wrap_content"
-        android:layout_width="wrap_content"
-        android:text="Login name"
-        android:textSize="20sp"
-        android:id="@+id/login_text"/>
-
-    <EditText
-        android:id="@+id/login_name"
+    android:orientation="vertical"
+    tools:context=".Login">
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/login_text"
-        android:hint="Enter login name here"
-        android:inputType="text"/>
+        android:layout_height="match_parent"
+        android:id="@+id/no_internet">
 
-    <TextView
-        android:layout_height="wrap_content"
-        android:layout_width="wrap_content"
-        android:text="Password"
-        android:textSize="20sp"
-        android:layout_below="@id/login_name"
-        android:id="@+id/password_text"/>
-
-    <EditText
-        android:id="@+id/password"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/password_text"
-        android:hint="Enter password here"
-        android:inputType="textPassword"/>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/password"
-        android:orientation="horizontal"
-        android:weightSum="1"
-        android:gravity="center"
-
-        >
-
-        <Button
+        <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="0.5"
-            android:text="Login"
-            android:id="@+id/login_button"
-            android:layout_marginEnd="10dp"/>
+            android:src="@drawable/noint"
+            android:id="@+id/noint"
+            android:layout_marginBottom="40dp"/>
 
-        <Button
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/try_again_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="0.5"
-            android:id="@+id/register_button"
-            android:text="Register" />
+            android:layout_below="@id/noint"
+            android:layout_centerHorizontal="true"
+            android:backgroundTint="@color/black"
+            android:paddingHorizontal="32dp"
+            android:text="Try Again"
+            android:layout_marginTop="-90dp"
+            android:textAllCaps="false"
+            app:cornerRadius="16dp" />
 
-    </LinearLayout>
+    </RelativeLayout>
+    <RelativeLayout
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/internet"
+
+        android:padding="20dp">
+
+        <TextView
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:text="Login name"
+            android:textSize="20sp"
+            android:id="@+id/login_text"/>
+
+        <EditText
+            android:id="@+id/login_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/login_text"
+            android:hint="Enter login name here"
+            android:inputType="text"/>
+
+        <TextView
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:text="Password"
+            android:textSize="20sp"
+            android:layout_below="@id/login_name"
+            android:id="@+id/password_text"/>
+
+        <EditText
+            android:id="@+id/password"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/password_text"
+            android:hint="Enter password here"
+            android:inputType="textPassword"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/password"
+            android:orientation="horizontal"
+            android:id="@+id/buttonLayout"
+            android:weightSum="1"
+            android:gravity="center"
+
+            >
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.5"
+                android:text="Login"
+                android:id="@+id/login_button"
+                android:layout_marginEnd="10dp"/>
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.5"
+                android:id="@+id/register_button"
+                android:text="Register" />
+
+        </LinearLayout>
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/biometrics_button"
+            android:text="Login With Biometrics"
+            android:layout_below="@id/buttonLayout"
+
+            />
 
 
+    </RelativeLayout>
 
 
-</RelativeLayout>
+</LinearLayout>
