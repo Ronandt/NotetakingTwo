@@ -37,7 +37,7 @@ class Login : AppCompatActivity() {
         object: BiometricPrompt.AuthenticationCallback() {
             override fun onAuthenticationError(errorCode: Int, errString: CharSequence?) {
                 super.onAuthenticationError(errorCode, errString)
-                println("Authentication err $errString")
+                Toast.makeText(applicationContext, "$errString", Toast.LENGTH_SHORT).show()
 
             }
 
@@ -63,6 +63,7 @@ class Login : AppCompatActivity() {
                     dialog, which -> println("Auth cancelled")
             }).build()
         binding.biometricsButton?.setOnClickListener {
+            println("BEUH")
             biometricPrompt.authenticate(getCancellationSignal(), mainExecutor, authenticaionCallback)
         }
 
